@@ -1,6 +1,6 @@
 module.exports = async function handler(req, res) {
 
-  // Libera acesso (CORS)
+  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -14,7 +14,14 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { message } = req.body;
+    let body = req.body;
+
+    // 🔥 CORREÇÃO PRINCIPAL
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
+
+    const message = body?.message || "oi";
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -27,11 +34,11 @@ module.exports = async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: "Você é ASKAR, um assistente amigável, inteligente e proativo. Ajuda com finanças, metas, tarefas e marketing."
+            content: "Você é ASKAR, um assistente inteligente, amigável e proativo. Ajuda com finanças, metas, tarefas e marketing."
           },
           {
             role: "user",
-            content: message || "oi"
+            content: message
           }
         ]
       })
